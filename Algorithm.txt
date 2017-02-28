@@ -1,0 +1,3 @@
+Try the algorithm with the created sample arena image
+Look into the serial communication of the robot
+Look into the openCV documentation on video analysis, camera calibration, object detection
