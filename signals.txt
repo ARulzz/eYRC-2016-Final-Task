@@ -1,0 +1,9 @@
+* -> start of motion
+f -> forward
+r -> right
+l -> left
+b -> turn back
+# -> end of motion
+1 -> pick
+0 -> place
+! -> end of task

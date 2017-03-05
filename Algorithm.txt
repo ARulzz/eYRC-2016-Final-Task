@@ -1,3 +1,77 @@
 Try the algorithm with the created sample arena image
 Look into the serial communication of the robot
 Look into the openCV documentation on video analysis, camera calibration, object detection
+
+
+Piazza Q&A:
+
+Q:
+Camera capture totally black image of the given arena.
+It gives the proper image of arena only after capturing the image for number of times.
+How to solve this problem such that proper image will get capture in single shot.
+Please help.
+
+A:
+You need to run a loop for atleast some 2-3 seconds before capturing the frame. This is required for camera lens to stabilize in given light.
+
+Q: Shape detection problem
+A: Try opencv denoising and/or deblurring function.
+
+Q: problem with xbee communication
+A: You dont need to detect xbee attached to the bot using XCTU, burn the hex code from the experiment folder, connect the other xbee to the pc, and open terminal in the XCTU and start sending the command, you will see the firebird moving.
+
+Use pyserial to interface zigbee
+
+Check out template matching
+
+Q:
+On building the Serial_Communication_ZigBee_wireless.c file we are recieving the following error. "attempt to use poisoned SIG_USART_RECV"
+
+A:
+1. in your code remove the (SIG_USART_RECV)  and replace it with this command (USART0_RX_vect) and then build your solution it will not produce any errors
+2. isr function should be
+ISR(USART0_RX_vect)
+
+You can use overhead camera to reach near the object. Use proximity/sharp sensor to get the robot positioned/oriented towards object before initiating the pick up. It is about position/orientation of robot wrt object.
+
+So it is better to use the camera given. You can try to check few things:
+1. Camera is focused
+2. While capturing frame, run a loop for 9-10 secs and then capture the frame. This can help camera to adjust a bit to light condition.
+3. Light on the arena should be uniform.
+4. If you have time, check for adaptive thresholding
+
+Code to take pic directly from camera
+
+import cv2
+ 
+# Camera 0 is the integrated web cam on my netbook
+camera_port = 0
+ 
+#Number of frames to throw away while the camera adjusts to light levels
+ramp_frames = 30
+ 
+# Now we can initialize the camera capture object with the cv2.VideoCapture class.
+# All it needs is the index to a camera port.
+camera = cv2.VideoCapture(camera_port)
+ 
+# Captures a single image from the camera and returns it in PIL format
+def get_image():
+ # read is the easiest way to get a full image out of a VideoCapture object.
+ retval, im = camera.read()
+ return im
+ 
+# Ramp the camera - these frames will be discarded and are only used to allow v4l2
+# to adjust light levels, if necessary
+for i in xrange(ramp_frames):
+ temp = get_image()
+print("Taking image...")
+# Take the actual image we want to keep
+camera_capture = get_image()
+file = "/home/codeplasma/test_image.png"
+# A nice feature of the imwrite method is that it will automatically choose the
+# correct format based on the file extension you provide. Convenient!
+cv2.imwrite(file, camera_capture)
+ 
+# You'll want to release the camera, otherwise you won't be able to create a new
+# capture object until your script exits
+del(camera)

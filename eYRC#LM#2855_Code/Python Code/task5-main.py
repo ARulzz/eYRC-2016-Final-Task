@@ -78,24 +78,24 @@ def sendPath(path, signal):
 		RobotPosition = (a,b)
 	# movements += '#'
 
-	# ser=serial.Serial("COM5",9600)
+	ser=serial.Serial("COM5",9600)
 	print movements
 	for i in range(0,len(movements)-1):
-		# ser.write(movements[i])
-		# time.sleep(1)
-		# while True:
-			# if ser.read() == '!':
-				# break		
+		ser.write(movements[i])
+		time.sleep(1)
+		while True:
+			if ser.read() == '!':
+				break		
 		print movements[i]
 	if signal == 'pick':
-		# ser.write(b'1')
-		# time.sleep(1)
+		ser.write(b'1')
+		time.sleep(1)
 		print '1'
 	elif signal == 'place':
-		# ser.write(b'0')
-		# time.sleep(1)
+		ser.write(b'0')
+		time.sleep(1)
 		print '0'
-	# ser.close()
+	ser.close()
 
 def getObjects(arena):
 	column=[]
@@ -175,7 +175,7 @@ def getOccupiedObjectsProps():
 
 # , [1, 1], [1, -1], [-1, 1], [-1, -1]
 def neighbors(node):
-	possibleDirections = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+	possibleDirections = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 	result = []
 	for dir in possibleDirections:
 		neighbor = (node[0] + dir[0], node[1] + dir[1])
@@ -183,12 +183,10 @@ def neighbors(node):
 			result.append(neighbor)
 	return result
 
-def cost(current, next, goal):
+def cost(next, goal):
 	if next == goal:
 		return 0
 	elif next in obstacles:
-		return 100000
-	elif (abs(current[0] - next[0]) + abs(current[1] - next[1])) == 2:
 		return 100000
 	return 1
 
@@ -208,7 +206,7 @@ def a_star(start, goal):
 		if current == goal:
 			break
 		for next in neighbors(current):
-			new_cost = cost_so_far[current] + cost(current, next, goal)
+			new_cost = cost_so_far[current] + cost(next, goal)
 			if next not in cost_so_far or new_cost < cost_so_far[next]:
 				cost_so_far[next] = new_cost
 				priority = new_cost + heuristic(goal, next)
@@ -306,23 +304,23 @@ for p in range(0,len(door_area)):
 		if flag:		 
 			paths.put([i, match, pathRM, pathMD], pathLenTotal)
 	[start, match, pathRM, pathMD] = paths.get()
-	print "Robot pos= ", RobotPosition
-	print "start= ",start
-	print "match = ",match
-	print "PathRM = ",pathRM
-	print "PathMD = ",pathMD
+	# print "Robot pos= ", RobotPosition
+	# print "start= ",start
+	# print "match = ",match
+	# print "PathRM = ",pathRM
+	# print "PathMD = ",pathMD
 	sendPath(pathRM[1:], 'pick')
-	# ser=serial.Serial("COM5",9600)
-	# while True:
-	# 	if ser.read() == '!':
-	# 		break;
-	# ser.close()		
+	ser=serial.Serial("COM5",9600)
+	while True:
+		if ser.read() == '!':
+			break;
+	ser.close()		
 	sendPath(pathMD[1:], 'place')
-	# ser=serial.Serial("COM5",9600)
-	# while True:
-	# 	if ser.read() == '!':
-	# 		break;		
-	# ser.close()
+	ser=serial.Serial("COM5",9600)
+	while True:
+		if ser.read() == '!':
+			break;		
+	ser.close()
 	door_area.remove(start)
 	work_area.remove(match)
 	obstacles.remove(match)
